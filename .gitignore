@@ -151,3 +151,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+/core/sqlite-drop-all.sql
+/core/database.sqlite
+/core/sqlite-create-all.sql

@@ -1,8 +1,8 @@
 <configuration scan="true" scanPeriod="10 seconds">
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <!-- filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
-        </filter>
+        </filter -->
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}:%L - %msg%n</pattern>
         </encoder>
@@ -29,6 +29,7 @@
 
     <!-- main application -->
     <logger name="cl.electrans.sar" level="DEBUG"/>
+    <logger name="com.durrutia" level="DEBUG"/>
 
     <!-- logger name="io.ebean.dbmigration.DdlGenerator" level="TRACE"/ -->
     <!-- logger name="org.avaje.dbmigration.ddl" level="TRACE"/ -->
