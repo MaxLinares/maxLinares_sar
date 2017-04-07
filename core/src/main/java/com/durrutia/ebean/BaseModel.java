@@ -13,6 +13,9 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 import io.ebean.Model;
+import io.ebean.annotation.Cache;
+import io.ebean.annotation.CacheBeanTuning;
+import io.ebean.annotation.CacheQueryTuning;
 import io.ebean.annotation.SoftDelete;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
@@ -23,6 +26,10 @@ import lombok.extern.slf4j.Slf4j;
  * @author Diego Urrutia Astorga <durrutia@ucn.cl>
  * @version 20170407154500
  */
+@Cache(enableQueryCache = true, enableBeanCache = true, naturalKey = "id", readOnly = true)
+@CacheQueryTuning(maxSecsToLive = 30)
+@CacheBeanTuning(maxSecsToLive = 30)
+// @History
 @MappedSuperclass
 @Slf4j
 public class BaseModel extends Model {
