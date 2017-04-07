@@ -1,0 +1,17 @@
+group 'cl.electrans'
+version '1.0-SNAPSHOT'
+
+// Version de gradle-wrapper a utilizar
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.4.1'
+}
+
+// Lugar donde se dejan los archivos temporales de compilacion
+allprojects {
+    buildDir = "${System.env.TEMP}//gradle-build//${rootProject.name}//${project.name}"
+}
+
+// Borro los temporales al limpiar
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
