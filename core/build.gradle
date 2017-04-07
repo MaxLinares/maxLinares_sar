@@ -1,0 +1,97 @@
+group 'cl.electrans.sar'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+configurations {
+    enhance
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+
+    // JUnit
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    // http://joel-costigliola.github.io/assertj/
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.2'
+
+    // Simple, light-weight Java class for generating lorem ipsum placeholder text
+    testCompile 'de.sven-jacobs:loremipsum:1.0'
+
+    // Populus
+    testCompile 'io.github.benas:random-beans:3.6.0'
+
+    // H2, HSQLDB, SQLite Database Engine
+    testCompile 'com.h2database:h2:1.4.194'
+    testCompile 'org.hsqldb:hsqldb:2.3.4'
+    compile 'org.xerial:sqlite-jdbc:3.16.1'
+
+    // Logger
+    compile 'org.slf4j:slf4j-api:1.8.0-alpha0'
+    compile 'ch.qos.logback:logback-core:1.2.3'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+
+    // Persistencia: Ebeans
+    compile 'io.ebean:ebean:10.2.1'
+
+    // Testing with Ebeans
+    // testCompile 'org.avaje:avaje-agentloader:2.1.2'
+    // testCompile 'io.ebean:ebean-agent:10.1.2'
+    enhance 'io.ebean:ebean-agent:10.1.7'
+    // compile 'io.ebean:ebean-agent:10.1.2'
+    // runtime 'io.ebean:ebean-agent:10.1.2'
+
+    // Query generators: https://ebean-orm.github.io/docs/query/typesafe
+    // compile 'io.ebean:ebean-querybean:10.1.1'
+    // compile 'io.ebean:querybean-agent:10.1.1'
+    // compile 'io.ebean:ebean-dbmigration:10.1.1'
+    // compile 'io.ebean:querybean-generator:10.1.1'
+
+    // Validaciones
+    compile 'org.hibernate:hibernate-validator:6.0.0.Alpha2'
+    compile 'javax.validation:validation-api:2.0.0.Alpha2'
+
+    // ToString helper
+    compile 'org.apache.commons:commons-lang3:3.5'
+
+    // Guava para pre-condiciones
+    compile 'com.google.guava:guava:21.0'
+
+    // JSON
+    compile 'com.google.code.gson:gson:2.8.0'
+    // http://jsoniter.com/
+    // compile 'com.jsoniter:jsoniter:0.9.7'
+
+    // Lombok!
+    compile 'org.projectlombok:lombok:1.16.16'
+
+}
+
+test {
+    logger.info("Testing jvmArgs ..")
+    jvmArgs "-javaagent:${configurations.enhance.singleFile}"
+}
+
+buildscript {
+
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        // Latest versions
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.14.0'
+    }
+
+}
