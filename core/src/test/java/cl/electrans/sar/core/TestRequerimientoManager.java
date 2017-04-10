@@ -34,7 +34,7 @@ public class TestRequerimientoManager {
      * Configuracion de la base de datos:  h2, hsql, sqlite, sqlite-mem
      * WARN: hsql no soporta ENCRYPT
      */
-    private static final String DB = "sqlite";
+    private static final String DB = "pgsql"; //"sqlite";
 
     /**
      * Backend

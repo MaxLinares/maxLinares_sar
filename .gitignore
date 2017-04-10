@@ -154,3 +154,5 @@ Temporary Items
 /core/sqlite-drop-all.sql
 /core/database.sqlite
 /core/sqlite-create-all.sql
+/core/pgsql-create-all.sql
+/core/pgsql-drop-all.sql

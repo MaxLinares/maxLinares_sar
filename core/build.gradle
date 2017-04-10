@@ -35,6 +35,9 @@ dependencies {
     testCompile 'org.hsqldb:hsqldb:2.3.4'
     compile 'org.xerial:sqlite-jdbc:3.16.1'
 
+    // PostgreSQL Driver
+    compile 'org.postgresql:postgresql:42.0.0'
+
     // Logger
     compile 'org.slf4j:slf4j-api:1.7.22'
     compile 'ch.qos.logback:logback-core:1.2.3'
