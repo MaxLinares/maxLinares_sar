@@ -31,8 +31,8 @@ public final class BaseModelDAO {
      */
     public <T> List<T> findList(Class<T> clazz) {
         return this.ebeanServer.find(clazz)
-                .setUseCache(true)
-                .setUseQueryCache(true)
+                // .setUseCache(true)
+                // .setUseQueryCache(true)
                 .findList();
     }
 
@@ -42,10 +42,10 @@ public final class BaseModelDAO {
      * @param propertyName
      * @param value
      */
-    public <E> E get(Class<E> clazz, String propertyName, Object value) {
+    public <T> T get(Class<T> clazz, String propertyName, Object value) {
         return this.ebeanServer.find(clazz)
-                .setUseQueryCache(true)
-                .setUseCache(true)
+                // .setUseQueryCache(true)
+                // .setUseCache(true)
                 .where()
                 .eq(propertyName, value)
                 .findUnique();
