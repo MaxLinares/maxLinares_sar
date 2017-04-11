@@ -41,6 +41,7 @@ public class TestRequerimientoManager {
      */
     // private static final String DB = "pgsql";
     private static final String DB = "sqlite";
+    // private static final String DB = "sqlite-mem";
 
     /**
      * Backend
