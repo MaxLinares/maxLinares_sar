@@ -1,13 +1,11 @@
 package cl.electrans.sar.core;
 
 import com.durrutia.ebean.BaseModelDAO;
-import com.durrutia.ebean.EbeanServerBuilder;
-import com.google.common.base.Preconditions;
 
 import java.util.List;
 
+import cl.electrans.sar.core.manager.RequerimientoManager;
 import cl.electrans.sar.core.model.Requerimiento;
-import io.ebean.EbeanServer;
 
 /**
  * @author Diego Urrutia Astorga <durrutia@ucn.cl>
@@ -25,16 +23,8 @@ public class Service {
      */
     public Service(final String database) {
 
-        Preconditions.checkNotNull(database, "Database name is null");
-
-        // EbeanServer
-        final EbeanServer ebeanServer = new EbeanServerBuilder(database)
-                .addClass(Requerimiento.class)
-                .build();
-
-        // dao
-        final BaseModelDAO baseModelDAO = new BaseModelDAO(ebeanServer);
-        Preconditions.checkNotNull(baseModelDAO, "BaseModelDao is null");
+        // Configuration de la base de datos.
+        final BaseModelDAO baseModelDAO = BaseModelDAOFactory.buildBaseModelDAO(database);
 
         // Manager de requerimientos.
         this.requerimientoManager = new RequerimientoManager(baseModelDAO);

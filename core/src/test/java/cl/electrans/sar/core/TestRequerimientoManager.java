@@ -1,5 +1,6 @@
 package cl.electrans.sar.core;
 
+import com.durrutia.ebean.BaseModelDAO;
 import com.google.common.base.Stopwatch;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -19,6 +20,7 @@ import java.util.stream.IntStream;
 
 import javax.persistence.PersistenceException;
 
+import cl.electrans.sar.core.manager.RequerimientoManager;
 import cl.electrans.sar.core.model.Requerimiento;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,10 +32,10 @@ import lombok.extern.slf4j.Slf4j;
 public class TestRequerimientoManager {
 
     /**
-     * Todos los test deben terminar antes de 120 segundos.
+     * Todos los test deben terminar antes de 30 segundos.
      */
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(120);
+    public Timeout globalTimeout = Timeout.seconds(30);
 
     /**
      * Configuracion de la base de datos:  h2, hsql, sqlite, sqlite-mem
@@ -44,9 +46,9 @@ public class TestRequerimientoManager {
     // private static final String DB = "sqlite-mem";
 
     /**
-     * Backend
+     * {@link RequerimientoManager}.
      */
-    private Service service;
+    private RequerimientoManager requerimientoManager;
 
     /**
      * Cronometro
@@ -72,8 +74,10 @@ public class TestRequerimientoManager {
         stopWatch = Stopwatch.createStarted();
         log.debug("BeforeTest +++++++++++++++++++++++++++++++++ Initializing Test Suite with database: {} ..", DB);
 
+        final BaseModelDAO baseModelDAO = BaseModelDAOFactory.buildBaseModelDAO(DB);
+
         // Crear e inicializar
-        this.service = new Service(DB);
+        this.requerimientoManager = new RequerimientoManager(baseModelDAO);
 
         log.debug("BeforeTest --------------------------------- Done.");
     }
@@ -85,7 +89,7 @@ public class TestRequerimientoManager {
     public void afterTest() {
 
         log.debug("AfterTest ++++++++++++++++++++++++++++++++++++ Shutting down the database ..");
-        this.service.shutdown();
+        this.requerimientoManager.shutdown();
 
         log.debug("AfterTest ------------------------------------ Finished in {}.", stopWatch.toString());
     }
@@ -113,7 +117,7 @@ public class TestRequerimientoManager {
 
         // List ..
         {
-            final List<Requerimiento> requerimientos = this.service.getRequerimientos();
+            final List<Requerimiento> requerimientos = this.requerimientoManager.getRequerimientos();
             Assertions.assertThat(requerimientos).hasSize(1);
 
             for (final Requerimiento r : requerimientos) {
@@ -123,17 +127,17 @@ public class TestRequerimientoManager {
 
         // Get ..
         {
-            final Requerimiento requerimiento = this.service.getRequerimiento(87242017L);
+            final Requerimiento requerimiento = this.requerimientoManager.getRequerimiento(87242017L);
             Assertions.assertThat(requerimiento).isNotNull();
         }
 
         // Shutdown
         {
-            this.service.shutdown();
+            this.requerimientoManager.shutdown();
 
             // Se debe caer en caso de tratar de obtener algo despues del shutdown.
             Assertions.assertThatThrownBy(() -> {
-                this.service.getRequerimiento(1L);
+                this.requerimientoManager.getRequerimiento(1L);
             }).isInstanceOf(PersistenceException.class);
 
         }
@@ -169,7 +173,7 @@ public class TestRequerimientoManager {
             final Stopwatch stopwatch = Stopwatch.createStarted();
             final int max = 1000;
             for (int i = 0; i < max; i++) {
-                this.service.getRequerimientos().size();
+                this.requerimientoManager.getRequerimientos().size();
             }
             log.info("{} selects in {}.", max, stopwatch);
 
@@ -196,7 +200,7 @@ public class TestRequerimientoManager {
 
         log.debug("Starting multithreading with {} tasks in {} cores.", tasks, cores);
 
-        IntStream.range(0, tasks).forEach(i -> executorService.execute(new InsertTask(this.service)));
+        IntStream.range(0, tasks).forEach(i -> executorService.execute(new InsertTask()));
 
         log.debug("Waiting for termination ..");
         executorService.shutdown();
@@ -226,14 +230,8 @@ public class TestRequerimientoManager {
         /**
          *
          */
-        private Service service;
+        public InsertTask() {
 
-        /**
-         *
-         * @param service
-         */
-        public InsertTask(final Service service) {
-            this.service = service;
         }
 
         /**

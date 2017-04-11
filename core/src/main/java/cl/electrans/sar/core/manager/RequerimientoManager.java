@@ -1,4 +1,4 @@
-package cl.electrans.sar.core;
+package cl.electrans.sar.core.manager;
 
 import com.durrutia.ebean.BaseModelDAO;
 
