@@ -2,6 +2,7 @@ package cl.electrans.sar.core;
 
 import com.google.common.base.Stopwatch;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +12,10 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import javax.persistence.PersistenceException;
 
@@ -25,16 +30,17 @@ import lombok.extern.slf4j.Slf4j;
 public class TestRequerimientoManager {
 
     /**
-     * Todos los test deben terminar antes de 60 segundos.
+     * Todos los test deben terminar antes de 120 segundos.
      */
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(60);
+    public Timeout globalTimeout = Timeout.seconds(120);
 
     /**
      * Configuracion de la base de datos:  h2, hsql, sqlite, sqlite-mem
      * WARN: hsql no soporta ENCRYPT
      */
-    private static final String DB = "pgsql"; //"sqlite";
+    // private static final String DB = "pgsql";
+    private static final String DB = "sqlite";
 
     /**
      * Backend
@@ -52,7 +58,7 @@ public class TestRequerimientoManager {
     @BeforeClass
     public static void setupTest() {
 
-        log.debug("Setting Test ..");
+        log.debug("Setting up Test ..");
 
     }
 
@@ -168,6 +174,103 @@ public class TestRequerimientoManager {
 
         }
 
+    }
+
+    /**
+     * Test de multithread
+     */
+    @Test
+    public void benchmarkThreadInsert() throws InterruptedException {
+
+        final Stopwatch sw = Stopwatch.createStarted();
+
+        // Numero de inserts
+        final int tasks = 1000;
+
+        // Numero de nucleos a utilizar
+        final int cores = Runtime.getRuntime().availableProcessors();
+
+        // Executor
+        final ExecutorService executorService = Executors.newFixedThreadPool(cores);
+
+        log.debug("Starting multithreading with {} tasks in {} cores.", tasks, cores);
+
+        IntStream.range(0, tasks).forEach(i -> executorService.execute(new InsertTask(this.service)));
+
+        log.debug("Waiting for termination ..");
+        executorService.shutdown();
+
+        log.debug("Init shutdown in {}.", sw);
+
+        // Espera de 10 segundos para terminar
+        while (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+            log.debug("Waiting 10 second for finish ..");
+        }
+
+        log.debug("Tasks ended in {}.", sw);
+
+        long millis = sw.elapsed(TimeUnit.MICROSECONDS);
+        double microseconds = millis / tasks;
+        // log.info("MicroS: {}", microseconds);
+        log.info("i/s: {}", 1000000 / microseconds);
+
+    }
+
+    /**
+     *
+     */
+    @Slf4j
+    private static class InsertTask implements Runnable {
+
+        /**
+         *
+         */
+        private Service service;
+
+        /**
+         *
+         * @param service
+         */
+        public InsertTask(final Service service) {
+            this.service = service;
+        }
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run() {
+
+            try {
+
+                final Long id = RandomUtils.nextLong();
+
+                log.debug("Inserting id: {}", id);
+
+                final Requerimiento requerimiento = Requerimiento.builder()
+                        .ordenProceso(id)
+                        .numeroCotizacion(id)
+                        .detalle("Multithread " + id)
+                        .prioridad(Requerimiento.Prioridad.URGENTE)
+                        .build();
+                requerimiento.save();
+
+                log.debug("Inserted: {}", requerimiento);
+
+            } catch (Exception ex) {
+                log.error("Error", ex);
+                Assertions.fail("Fail", ex);
+            }
+
+        }
     }
 
 }
